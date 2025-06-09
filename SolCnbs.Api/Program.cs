@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using SolCnbs.Api.Endpoints;
 using SolCnbs.Data.Context;
+using SolCnbs.Data.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +15,9 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddDbContext<SolDbContext>(opciones =>
     opciones.UseSqlServer("name=SolDbConnection"));
+
+builder.Services.AddScoped<DbContext, SolDbContext>();
+builder.Services.AddScoped<IAuditRegisterRepositories, AuditRegisterRepositories>();
 
 builder.Services.AddOpenApi();
 
