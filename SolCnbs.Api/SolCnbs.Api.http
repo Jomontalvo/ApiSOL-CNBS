@@ -1,0 +1,6 @@
+@SolCnbs.Api_HostAddress = http://localhost:5023
+
+GET {{SolCnbs.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
