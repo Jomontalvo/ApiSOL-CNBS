@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using SolCnbs.Common.Models.Dtos;
 using SolCnbs.Data.Context;
 
@@ -21,13 +22,22 @@ public class AuditRegistryRepository(SolDbContext context) : IAuditRegistryRepos
                 return new ActionResponse<object>
                 {
                     IsSuccess = false,
-                    Message = "Error: El código de trámite ingresado no existe."
+                    Message = $"Error: El registro con código {codigoTramite} no existe."
                 };
             }
             var codigoTipoTramite = templateResult.CodigoTipoTramite;
 
-            var procTypeResult = await context.ProcedureTypes.FindAsync(codigoTipoTramite);
-            var procedureTypeName = procTypeResult!.Nombre;
+            var procTypeResult = await context.ProcedureTypes
+                .AsNoTracking().SingleOrDefaultAsync(x => x.CodigoTipoTramite == codigoTipoTramite);
+
+            if (procTypeResult is null)
+                return new ActionResponse<object>
+                {
+                    IsSuccess = false,
+                    Message = $"Error: El tipo de trámite buscado [{codigoTipoTramite}] no existe."
+                };
+
+            var procedureTypeName = procTypeResult.Nombre;
             templateResult.NombreTramite = procedureTypeName;
 
             await context.SaveChangesAsync();
@@ -35,7 +45,7 @@ public class AuditRegistryRepository(SolDbContext context) : IAuditRegistryRepos
             return new ActionResponse<object>
             {
                 IsSuccess = true,
-                Message = "Datos actualizados exitosamente (tipo de trámite encontrado)."
+                Message = "Datos del tipo de trámite actualizados exitosamente."
             };
 
         }
@@ -65,12 +75,21 @@ public class AuditRegistryRepository(SolDbContext context) : IAuditRegistryRepos
                 return new ActionResponse<object>
                 {
                     IsSuccess = false,
-                    Message = "Error: El código de molde de documento anexo ingresado no existe."
+                    Message = $"Error: El registro con código [{codigoTramite}] no existe."
                 };
             }
             var documentTemplateId = Convert.ToInt32(templateResult.CodigoMolde);
 
-            var docResult = await context.Templates.FindAsync(documentTemplateId);
+            var docResult = await context.Templates.AsNoTracking()
+                .SingleOrDefaultAsync(x => x.CodigoMoldeDocumento == documentTemplateId);
+
+            if (docResult is null)
+                return new ActionResponse<object>
+                {
+                    IsSuccess = false,
+                    Message = $"Error: El código de molde de documento anexo [{documentTemplateId}] no existe."
+                };
+
             var templateName = docResult!.NombreMolde;
             templateResult.NombreMolde = templateName;
 
@@ -79,7 +98,7 @@ public class AuditRegistryRepository(SolDbContext context) : IAuditRegistryRepos
             return new ActionResponse<object>
             {
                 IsSuccess = true,
-                Message = "Datos actualizados (tipo de molde de documento anexo encontrado)."
+                Message = "Datos del molde de documento anexo actualizados."
             };
 
         }

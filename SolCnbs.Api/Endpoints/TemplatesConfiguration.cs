@@ -1,3 +1,4 @@
+using SolCnbs.Common.Models.Dtos;
 using SolCnbs.Data.Repositories;
 
 namespace SolCnbs.Api.Endpoints;
@@ -15,43 +16,33 @@ public static class TemplatesConfiguration
     /// Get Procedure Type Name
     /// </summary>
     /// <param name="repository"></param>
-    /// <param name="token"></param>
-    /// <param name="codigoTramite"></param>
+    /// <param name="datosTramite"></param>
     /// <returns></returns>
     private static async Task<IResult> GetProcedureTypeName(
         IAuditRegistryRepository repository,
-        string? token,
-        long codigoTramite)
+        SolCallParameters datosTramite)
     {
-        if (codigoTramite == 0)
-            return TypedResults.BadRequest("Error: Debe especificar el tipo de trámite.");
+        if (datosTramite is null)
+            return TypedResults.BadRequest("Error: Debe especificar los parámteros de llamada.");
 
-        var result = await repository.GetProcedureTypeAsync(codigoTramite);
-        if (!result.IsSuccess)
-            return TypedResults.BadRequest(result.Message);
-
-        return TypedResults.Ok(result.Message);
+        var result = await repository.GetProcedureTypeAsync(datosTramite.ProcedureCode);
+        return TypedResults.Ok(await result.MapToSolResponse());
     }
 
     /// <summary>
     /// Get Documento Template Name
     /// </summary>
     /// <param name="repository"></param>
-    /// <param name="token"></param>
-    /// <param name="codigoTramite"></param>
+    /// <param name="datosTramite"></param>
     /// <returns></returns>
     private static async Task<IResult> GetTemplateDocumentName(
     IAuditRegistryRepository repository,
-    string? token,
-    long codigoTramite)
+    SolCallParameters datosTramite)
     {
-        if (codigoTramite == 0)
-            return TypedResults.BadRequest("Error: Debe especificar el tipo de molde de decumento anexo.");
+        if (datosTramite is null)
+            return TypedResults.BadRequest("Error: Debe especificar los parámetros de llamada.");
 
-        var result = await repository.GetTemplateNameAsync(codigoTramite);
-        if (!result.IsSuccess)
-            return TypedResults.BadRequest(result.Message);
-
-        return TypedResults.Ok(result.Message);
+        var result = await repository.GetTemplateNameAsync(datosTramite.ProcedureCode);
+        return TypedResults.Ok(await result.MapToSolResponse());
     }
 }
