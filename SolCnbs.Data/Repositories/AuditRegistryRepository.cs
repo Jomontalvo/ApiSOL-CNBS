@@ -22,7 +22,7 @@ public class AuditRegistryRepository(SolDbContext context) : IAuditRegistryRepos
                 return new ActionResponse<object>
                 {
                     IsSuccess = false,
-                    Message = $"Error: El registro con código {codigoTramite} no existe."
+                    Message = $"Error: El registro con código [{codigoTramite}] no existe."
                 };
             }
             var codigoTipoTramite = templateResult.CodigoTipoTramite;
