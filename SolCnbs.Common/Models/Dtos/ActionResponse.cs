@@ -1,5 +1,3 @@
-using System;
-
 namespace SolCnbs.Common.Models.Dtos;
 
 public class ActionResponse<T> where T : class

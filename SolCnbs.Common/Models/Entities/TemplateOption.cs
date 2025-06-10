@@ -1,4 +1,3 @@
-using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -9,10 +8,10 @@ public class TemplateOption
 {
     [Key]
     [Column("codigo_registro")]
-    public Int64 CodigoRegistro { get; set; }
+    public long CodigoRegistro { get; set; }
 
     [Column("codigo_tramite")]
-    public Int64? CodigoTramite { get; set; }
+    public long? CodigoTramite { get; set; }
 
     [Column("codigo_usuario")]
     public int CodigoUsuario { get; set; }

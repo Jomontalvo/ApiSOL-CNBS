@@ -24,11 +24,11 @@ var app = builder.Build();
 
 //if (app.Environment.IsDevelopment())
 //{
-    app.MapOpenApi();
-    app.UseSwaggerUI(c =>
+app.MapOpenApi();
+app.UseSwaggerUI(c =>
 {
-    c.SwaggerEndpoint("../openapi/v1.json", "TGR-1 SOL Api");
-    c.RoutePrefix = "swagger";
+c.SwaggerEndpoint("../openapi/v1.json", "TGR-1 SOL Api");
+c.RoutePrefix = "swagger";
 });
 //}
 app.UseHttpsRedirection();

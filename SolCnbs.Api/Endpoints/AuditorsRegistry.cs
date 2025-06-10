@@ -1,5 +1,3 @@
-using System;
-
 namespace SolCnbs.Api.Endpoints;
 
 public static class AuditorsRegistry
