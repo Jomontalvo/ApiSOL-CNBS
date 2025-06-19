@@ -6,6 +6,81 @@ namespace SolCnbs.Data.Repositories;
 
 public class AuditRegistryRepository(SolDbContext context) : IAuditRegistryRepository
 {
+
+    /// <summary>
+    /// Get procedure type list
+    /// </summary>
+    /// <param name="campo"></param>
+    /// <param name="dependeDe"></param>
+    /// <param name="valor"></param>
+    /// <returns></returns>
+    public async Task<ActionResponse<IEnumerable<string>>> GetProcedureTypeListAsync(
+        string? campo, string? dependeDe, string? valor)
+    {
+        try
+        {
+            var requestList = await context.ProcedureTypes
+                .AsNoTracking()
+                .Select(x => string.Concat(x.CodigoTipoTramite, " - ", x.Nombre))
+                .ToListAsync();
+            return new ActionResponse<IEnumerable<string>>
+            {
+                IsSuccess = true,
+                Result = requestList
+            };
+        }
+        catch (Exception ex)
+        {
+            return new ActionResponse<IEnumerable<string>>
+            {
+                IsSuccess = false,
+                Message = ex.Message,
+                Result = []
+            };
+        }
+    }
+
+    /// <summary>
+    /// Get Template List by Procedure Type
+    /// </summary>
+    /// <param name="campo"></param>
+    /// <param name="dependeDe"></param>
+    /// <param name="valor"></param>
+    /// <returns></returns>
+    public async Task<ActionResponse<IEnumerable<ItemListResponse>>> GetTemplateListAsync(
+        string? campo, string? dependeDe, string? valor)
+    {
+        try
+        {
+            var resultList = await (
+                from tt in context.ProcedureTypes.AsNoTracking()
+                join mdt in context.Templates.AsNoTracking()
+                    on tt.CodigoTipoTramite equals mdt.CodigoTipoTramite
+                where tt.CodigoTipoTramite == Convert.ToInt32(valor)
+                select new ItemListResponse
+                {
+                    Parent = tt.CodigoTipoTramite + " - " + tt.Nombre,
+                    Value = mdt.CodigoMoldeDocumento + " - " + mdt.NombreMolde
+                }).ToListAsync();
+
+            return new ActionResponse<IEnumerable<ItemListResponse>>
+            {
+                IsSuccess = true,
+                Result = resultList
+            };
+        }
+        catch (Exception ex)
+        {
+            return new ActionResponse<IEnumerable<ItemListResponse>>
+            {
+                IsSuccess = false,
+                Message = ex.Message,
+                Result = []
+            };
+
+        }
+    }
+
     /// <summary>
     /// Get procedure type name
     /// </summary>
