@@ -11,4 +11,6 @@ public class ProcedureType
     public int CodigoTipoTramite { get; set; }
     [Column("nombre")]
     public string? Nombre { get; set; }
+
+
 }
