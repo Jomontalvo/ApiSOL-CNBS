@@ -93,7 +93,7 @@ public class AuditRegistryRepository(SolDbContext Context, CodesDbContext CodesC
             Procedure.CodigoCodificador = Number;
             await Context.SaveChangesAsync();
 
-            return new ActionResponse<object>(true, "Codigo Codificador ha sido actualizado.");
+            return new ActionResponse<object>(true, "Código Codificador ha sido actualizado.");
 
         }
         catch (Exception ex)
@@ -106,14 +106,19 @@ public class AuditRegistryRepository(SolDbContext Context, CodesDbContext CodesC
     {
         try
         {
-            var AdditionalData = await Context.AdditionalData.FindAsync(codigoTramite);
+            var TipoTramite = Context.Database.SqlQueryRaw<int?>("SELECT codigo_tipo_tramite FROM tramite WHERE codigo_tramite = @p0", codigoTramite).ToList().FirstOrDefault();
 
-            if (AdditionalData is null)
+            if (!TipoTramite.HasValue && TipoTramite!.Value > 0)
                 return new ActionResponse<object>(false, $"Error: El registro con código [{codigoTramite}] no existe.");
+
+            var Tipo = TipoTramite.Value switch { 
+                1 => "RE", 
+                2 => "RD", 
+                4 => "RB" };
 
             var Number = CodesContext.Database.SqlQueryRaw<string>("EXEC [dbo].[GetNumeroResolucion] @p0,@p1,@p2,@p3,@p4,@p5,@p6,@p7,@p8",
                                            "GPU",
-                                           "RE",
+                                           Tipo,
                                            "RA",
                                            DateTime.Now.ToString("dd-MM-yyyy"),
                                            "RAE",
@@ -121,11 +126,10 @@ public class AuditRegistryRepository(SolDbContext Context, CodesDbContext CodesC
                                            "00",
                                            "REG",
                                            "SOL").AsEnumerable().FirstOrDefault();
+            
+            var r = await Context.Database.ExecuteSqlRawAsync($"UPDATE datos_adicionales_{TipoTramite.Value} SET codigo_documento = @p0 WHERE codigo_tramite = @p1", Number!, codigoTramite);
 
-            AdditionalData.CodigoDocumento = Number;
-            await Context.SaveChangesAsync();
-
-            return new ActionResponse<object>(true, "Codigo Codificador ha sido actualizado.");
+            return new ActionResponse<object>(true, "Número de Resolución ha sido actualizado.");
 
         }
         catch (Exception ex)
